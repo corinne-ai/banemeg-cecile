@@ -1,0 +1,91 @@
+job02
+
+docker run hello-world
+docker ps -a
+docker images
+docker rm id container id
+
+job03
+
+# Dockerfile
+FROM debian:latest
+CMD ["echo", "Hello, World!"]
+docker build -t my-helloworld .
+docker run my-helloworld
+
+job04: 
+
+# Dockerfile
+FROM debian:latest
+RUN apt-get update && apt-get install -y openssh-server && mkdir /var/run/sshd
+RUN echo 'root:root123' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
+CMD ["/usr/sbin/sshd", "-D"]
+EXPOSE 2222
+docker build -t ssh-server .
+docker run -d -p 2222:2222 ssh-server
+ssh root@192.168.1.21 -p 2222
+
+job05 alias:
+
+alias dps="docker ps"
+alias dimages="docker images"
+alias drm="docker rm"
+alias dstop="docker stop"
+source ~/ .bashrc
+
+job06 gestions des volumes
+
+docker volume create shared-data
+docker run -d -v shared-data:/data --name container1 debian
+docker run -d -v shared-data:/data --name container2 debian
+
+job07 docker avec nginx & ftp
+
+version: '3.8'
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - shared:/usr/share/nginx/html
+  ftp:
+    image: fauria/vsftpd
+    environment:
+      FTP_USER: Cecile
+      FTP_PASS: password
+    ports:
+      - "21:21"
+    volumes:
+      - shared:/home/vsftpd
+volumes:
+  shared:
+
+echo "<h1>banemeg cecile</h1>" > index.html
+
+job08
+
+FROM debian:latest
+RUN apt-get update && apt-get install -y nginx
+CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080
+docker build -t custom-nginx .
+docker run -d -p 8080:80 custom-nginx
+
+job09
+
+docker run -d -p 5000:5000 --name registry registry:2
+docker run -d -p 8081:80 --name registry-ui \
+  --link registry -e REGISTRY_URL=http://registry:5000 \
+  joxit/docker-registry-ui:static
+
+
+
+
+
+
+
+
+

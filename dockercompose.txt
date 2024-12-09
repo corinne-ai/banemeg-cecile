@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - shared:/usr/share/nginx/html
+  ftp:
+    image: fauria/vsftpd
+    environment:
+      FTP_USER: user
+      FTP_PASS: password
+    ports:
+      - "21:21"
+    volumes:
+      - shared:/home/vsftpd
+volumes:
+  shared:
